@@ -1,5 +1,5 @@
 import { HStack, Button } from '@chakra-ui/react';
-import type { FilterType } from '../types/todo';
+import type { FilterType } from '@/types/todo';
 
 interface Props {
   filter: FilterType;

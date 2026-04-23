@@ -10,7 +10,7 @@ import {
   CheckboxIndicator,
   CheckboxHiddenInput,
 } from '@chakra-ui/react';
-import type { Todo } from '../types/todo';
+import type { Todo } from '@/types/todo';
 
 interface Props {
   todo: Todo;
@@ -148,7 +148,7 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: Props) {
                 size="sm"
                 variant="ghost"
                 colorPalette="blue"
-                onClick={() => setEditing(true)}
+                onClick={() => { setEditValue(todo.text); setEditing(true); }}
                 disabled={todo.completed}
               >
                 <EditIcon />

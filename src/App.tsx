@@ -8,12 +8,12 @@ import {
   Separator,
   Center,
 } from '@chakra-ui/react';
-import { useTodos } from './hooks/useTodos';
-import { useColorMode } from './hooks/useColorMode';
-import { TodoInput } from './components/TodoInput';
-import { TodoItem } from './components/TodoItem';
-import { TodoFilter } from './components/TodoFilter';
-import { TodoStats } from './components/TodoStats';
+import { useTodos } from '@/hooks/useTodos';
+import { useColorMode } from '@/hooks/useColorMode';
+import { TodoInput } from '@/components/TodoInput';
+import { TodoItem } from '@/components/TodoItem';
+import { TodoFilter } from '@/components/TodoFilter';
+import { TodoStats } from '@/components/TodoStats';
 
 function MoonIcon() {
   return (

@@ -10,7 +10,8 @@ export function useColorMode() {
   });
 
   useEffect(() => {
-    document.documentElement.dataset.theme = colorMode;
+    document.documentElement.classList.toggle('dark', colorMode === 'dark');
+    document.documentElement.classList.toggle('light', colorMode === 'light');
     localStorage.setItem('color-mode', colorMode);
   }, [colorMode]);
 

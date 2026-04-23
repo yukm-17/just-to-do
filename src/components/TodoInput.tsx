@@ -21,7 +21,7 @@ export function TodoInput({ onAdd }: Props) {
         ref={inputRef}
         value={value}
         onChange={e => setValue(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+        onKeyDown={e => e.key === 'Enter' && !e.nativeEvent.isComposing && handleSubmit()}
         placeholder="할 일을 입력하세요..."
         size="lg"
         borderRadius="xl"
