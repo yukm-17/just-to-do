@@ -1,8 +1,8 @@
-import { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   DndContext, closestCenter, DragOverlay,
   type DragStartEvent, type DragMoveEvent, type DragEndEvent,
-  PointerSensor, useSensor, useSensors,
+  MouseSensor, TouchSensor, useSensor, useSensors,
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { Box, VStack, Text } from '@chakra-ui/react';
@@ -98,7 +98,8 @@ export function TodoList({ todos, onReparent, ...handlers }: Props) {
   const [deltaX, setDeltaX] = useState(0);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
   );
 
   const allFlat = useMemo(() => flatten(todos), [todos]);
@@ -167,7 +168,7 @@ export function TodoList({ todos, onReparent, ...handlers }: Props) {
       onDragCancel={handleDragCancel}
     >
       <SortableContext items={flatItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
-        <VStack gap={1} align="stretch">
+        <VStack gap={1} align="stretch" style={{ userSelect: 'none', WebkitUserSelect: 'none' } as React.CSSProperties}>
           {flatItems.map(item => (
             <TodoItem
               key={item.id}

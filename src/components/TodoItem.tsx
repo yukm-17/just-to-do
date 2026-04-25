@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import {
-  HStack, VStack, Box, Text, Input, IconButton, Badge,
+  HStack, Box, Text, Input, IconButton, Badge,
   CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxHiddenInput,
 } from '@chakra-ui/react';
 import { useSortable } from '@dnd-kit/sortable';
@@ -45,6 +45,13 @@ function CheckIcon() {
 function CloseIcon() {
   return <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
 }
+function MoreIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+    </svg>
+  );
+}
 
 export function TodoItem({
   todo, depth,
@@ -55,6 +62,7 @@ export function TodoItem({
   const [editValue, setEditValue] = useState(todo.text);
   const [addingChild, setAddingChild] = useState(false);
   const [childText, setChildText] = useState('');
+  const [actionsOpen, setActionsOpen] = useState(false);
   const editRef = useRef<HTMLInputElement>(null);
   const childRef = useRef<HTMLInputElement>(null);
 
@@ -77,6 +85,9 @@ export function TodoItem({
     setAddingChild(false);
   };
   const cancelChild = () => { setChildText(''); setAddingChild(false); };
+
+  const openEdit = () => { setEditValue(todo.text); setEditing(true); setActionsOpen(false); };
+  const openAddChild = () => { setAddingChild(true); setActionsOpen(false); };
 
   const hasChildren = todo.children.length > 0;
 
@@ -108,6 +119,7 @@ export function TodoItem({
             color="fg.muted"
             flexShrink={0}
             px={0.5}
+            py={1}
             _active={{ cursor: 'grabbing' }}
             style={{ touchAction: 'none' }}
           >
@@ -156,16 +168,24 @@ export function TodoItem({
             </HStack>
           ) : (
             <>
-              <VStack flex={1} gap={0.5} align="start">
+              {/* 텍스트 영역: 액션 열릴 때 1줄로 축소 */}
+              <Box
+                flex={1}
+                minW={0}
+                onClick={() => actionsOpen && setActionsOpen(false)}
+                cursor={actionsOpen ? 'pointer' : 'default'}
+              >
                 <Text
-                  fontSize="sm" wordBreak="break-word"
+                  fontSize="sm"
+                  wordBreak="break-word"
                   textDecoration={todo.completed ? 'line-through' : 'none'}
                   color={todo.completed ? 'fg.muted' : 'fg'}
+                  style={actionsOpen ? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } : undefined}
                 >
                   {todo.text}
                 </Text>
-                {todo.meta && (
-                  <HStack gap={1} flexWrap="wrap">
+                {!actionsOpen && todo.meta && (
+                  <HStack gap={1} flexWrap="wrap" mt={0.5}>
                     <Badge size="sm" colorPalette="gray" borderRadius="full" variant="subtle">
                       ⏱ {todo.meta.estimatedMinutes}분
                     </Badge>
@@ -182,12 +202,45 @@ export function TodoItem({
                     </Badge>
                   </HStack>
                 )}
-              </VStack>
-              <HStack gap={0} flexShrink={0}>
-                <IconButton aria-label="하위 항목 추가" size="sm" variant="ghost" colorPalette="green" onClick={() => setAddingChild(true)}><PlusIcon /></IconButton>
-                <IconButton aria-label="수정" size="sm" variant="ghost" colorPalette="blue" onClick={() => { setEditValue(todo.text); setEditing(true); }} disabled={todo.completed}><EditIcon /></IconButton>
-                <IconButton aria-label="삭제" size="sm" variant="ghost" colorPalette="red" onClick={() => onDelete(todo.id)}><DeleteIcon /></IconButton>
-              </HStack>
+              </Box>
+
+              {/* 액션 영역 */}
+              {actionsOpen ? (
+                <HStack gap={0} flexShrink={0}>
+                  <IconButton
+                    aria-label="하위 항목 추가"
+                    size="sm" variant="ghost" colorPalette="green"
+                    onClick={openAddChild}
+                  ><PlusIcon /></IconButton>
+                  <IconButton
+                    aria-label="수정"
+                    size="sm" variant="ghost" colorPalette="blue"
+                    onClick={openEdit}
+                    disabled={todo.completed}
+                  ><EditIcon /></IconButton>
+                  <IconButton
+                    aria-label="삭제"
+                    size="sm" variant="ghost" colorPalette="red"
+                    onClick={() => { onDelete(todo.id); setActionsOpen(false); }}
+                  ><DeleteIcon /></IconButton>
+                  <IconButton
+                    aria-label="닫기"
+                    size="sm" variant="ghost" colorPalette="gray"
+                    onClick={() => setActionsOpen(false)}
+                  ><CloseIcon /></IconButton>
+                </HStack>
+              ) : (
+                <IconButton
+                  aria-label="더 보기"
+                  size="sm"
+                  variant="ghost"
+                  colorPalette="gray"
+                  flexShrink={0}
+                  onClick={() => setActionsOpen(true)}
+                >
+                  <MoreIcon />
+                </IconButton>
+              )}
             </>
           )}
         </HStack>
