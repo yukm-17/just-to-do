@@ -202,7 +202,6 @@ export default function App() {
 										energy={energy}
 										onToggle={toggleTodo}
 										onRecordCompletion={recordCompletion}
-										streak={streak}
 									/>
 								)}
 							</Box>

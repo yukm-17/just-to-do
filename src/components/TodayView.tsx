@@ -10,7 +10,6 @@ interface Props {
 	energy: EnergyLevel
 	onToggle: (id: string) => void
 	onRecordCompletion: () => void
-	streak: number
 }
 
 function SectionHeader({ emoji, title, count }: { emoji: string; title: string; count: number }) {
@@ -62,7 +61,6 @@ export function TodayView({
 	energy,
 	onToggle,
 	onRecordCompletion,
-	streak,
 }: Props) {
 	const [feedbackId, setFeedbackId] = useState<string | null>(null)
 	const [deferOpen, setDeferOpen] = useState(false)
@@ -93,13 +91,6 @@ export function TodayView({
 					<Text fontSize="sm" fontWeight="bold" color="fg">
 						{cfg.emoji} {cfg.label} 상태예요
 					</Text>
-					{streak > 0 && (
-						<HStack gap={1}>
-							<Text fontSize="xs" color="orange.400" fontWeight="bold">
-								🔥 {streak}일 연속
-							</Text>
-						</HStack>
-					)}
 				</HStack>
 				<Text fontSize="xs" color="fg.muted">
 					{cfg.description}
@@ -179,21 +170,6 @@ export function TodayView({
 						</>
 					)}
 
-					{/* 충분해 메시지 */}
-					{!recs.isOverloaded && recs.totalIncomplete > 0 && recs.doNow.length > 0 && (
-						<>
-							<Separator />
-							<Box bg="bg.success" borderRadius="xl" px={4} py={3}>
-								<Text fontSize="sm" fontWeight="bold">
-									✅ 오늘은 이 정도면 충분해요
-								</Text>
-								<Text fontSize="xs" color="fg.muted" mt={0.5}>
-									위 {Math.min(suggested, recs.doNow.length + recs.easyPicks.length)}개만 해도 오늘
-									잘 한 거예요.
-								</Text>
-							</Box>
-						</>
-					)}
 				</>
 			)}
 		</VStack>

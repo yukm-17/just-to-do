@@ -1,4 +1,4 @@
-import { HStack, VStack, Text, Button, Input } from '@chakra-ui/react';
+import { HStack, VStack, Text, Button } from '@chakra-ui/react';
 import type { TaskMeta, Difficulty, FocusLevel } from '@/types/todo';
 
 interface Props {
@@ -41,33 +41,24 @@ export function MetaInput({ meta, onChange }: Props) {
 
       <HStack gap={2}>
         <Text fontSize="xs" color="fg.muted" minW="max-content">예상 시간</Text>
-        <HStack gap={1}>
-          <Input
-            type="number"
-            size="xs"
-            w="60px"
-            min={1}
-            max={480}
-            value={meta.estimatedMinutes}
-            onChange={e => onChange({ ...meta, estimatedMinutes: Math.max(1, Number(e.target.value)) })}
-            borderRadius="lg"
-          />
-          <Text fontSize="xs" color="fg.muted">분</Text>
-        </HStack>
-        <HStack gap={1} ml={2}>
-          {[5, 15, 30, 60].map(m => (
-            <Button
-              key={m}
-              size="xs"
-              variant={meta.estimatedMinutes === m ? 'solid' : 'ghost'}
-              colorPalette="gray"
-              borderRadius="full"
-              onClick={() => onChange({ ...meta, estimatedMinutes: m })}
-            >
-              {m}분
-            </Button>
+        <select
+          value={meta.estimatedMinutes}
+          onChange={e => onChange({ ...meta, estimatedMinutes: Number(e.target.value) })}
+          style={{
+            fontSize: '12px',
+            padding: '2px 6px',
+            borderRadius: '8px',
+            border: '1px solid var(--chakra-colors-border)',
+            background: 'var(--chakra-colors-bg-subtle)',
+            color: 'inherit',
+            outline: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          {[5, 10, 15, 20, 30, 45, 60, 90, 120].map(m => (
+            <option key={m} value={m}>{m}분</option>
           ))}
-        </HStack>
+        </select>
       </HStack>
 
       <HStack gap={2} flexWrap="wrap">
