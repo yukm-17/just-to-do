@@ -1,10 +1,8 @@
 import { EnergySelector } from '@/components/EnergySelector'
 import { Onboarding } from '@/components/Onboarding'
 import { TodayView } from '@/components/TodayView'
-import { TodoFilter } from '@/components/TodoFilter'
 import { TodoInput } from '@/components/TodoInput'
 import { TodoList } from '@/components/TodoList'
-import { TodoStats } from '@/components/TodoStats'
 import { useColorMode } from '@/hooks/useColorMode'
 import { useEnergy } from '@/hooks/useEnergy'
 import { useStreak } from '@/hooks/useStreak'
@@ -79,9 +77,6 @@ export default function App() {
 	const { streak, recordCompletion } = useStreak()
 	const {
 		todos,
-		filteredTodos,
-		filter,
-		setFilter,
 		addTodo,
 		addChild,
 		toggleTodo,
@@ -89,9 +84,6 @@ export default function App() {
 		editTodo,
 		toggleCollapse,
 		reparentItem,
-		clearCompleted,
-		activeCount,
-		completedCount,
 	} = useTodos()
 
 	return (
@@ -148,6 +140,11 @@ export default function App() {
 									</IconButton>
 								</HStack>
 							</HStack>
+
+							{/* 기분 질문 */}
+							<Text fontSize="sm" color="fg.muted" mb={3}>
+								지금 기분이 어때요?
+							</Text>
 
 							{/* 에너지 선택 */}
 							<EnergySelector value={energy} onChange={setEnergy} />
@@ -212,22 +209,14 @@ export default function App() {
 							<Box bg="bg.panel" borderRadius="2xl" p={{ base: '4', md: '5' }} shadow="md">
 								<TodoInput onAdd={addTodo} />
 								<Separator my={4} />
-								<TodoFilter filter={filter} onFilterChange={setFilter} />
-								<Separator my={4} />
 
-								{filteredTodos.length === 0 ? (
+								{todos.length === 0 ? (
 									<Center py={10}>
-										<Text color="fg.muted" fontSize="sm">
-											{filter === 'completed'
-												? '완료된 항목이 없습니다'
-												: filter === 'active'
-												? '진행 중인 항목이 없습니다'
-												: '할 일을 추가해보세요!'}
-										</Text>
+										<Text color="fg.muted" fontSize="sm">할 일을 추가해보세요!</Text>
 									</Center>
 								) : (
 									<TodoList
-										todos={filteredTodos}
+										todos={todos}
 										onReparent={reparentItem}
 										onToggle={toggleTodo}
 										onDelete={deleteTodo}
@@ -235,17 +224,6 @@ export default function App() {
 										onAddChild={addChild}
 										onToggleCollapse={toggleCollapse}
 									/>
-								)}
-
-								{(activeCount > 0 || completedCount > 0) && (
-									<>
-										<Separator my={4} />
-										<TodoStats
-											activeCount={activeCount}
-											completedCount={completedCount}
-											onClearCompleted={clearCompleted}
-										/>
-									</>
 								)}
 							</Box>
 						)}

@@ -12,30 +12,43 @@ interface Props {
 	onRecordCompletion: () => void
 }
 
-function SectionHeader({ emoji, title, count }: { emoji: string; title: string; count: number }) {
+const DO_NOW_DESC: Record<EnergyLevel, string> = {
+	high: '집중됐을 때 처리할 핵심 작업이에요',
+	normal: '지금 처리하기 좋은 작업들이에요',
+	low: '지금 상태에서도 해볼 수 있어요',
+}
+
+function SectionHeader({ emoji, title, count, description }: { emoji: string; title: string; count: number; description?: string }) {
 	return (
-		<HStack gap={2}>
-			<Text fontSize="sm" fontWeight="bold">
-				{emoji} {title}
-			</Text>
-			{count > 0 && (
-				<Badge colorPalette="gray" borderRadius="full" size="sm">
-					{count}
-				</Badge>
+		<VStack gap={0.5} align="start">
+			<HStack gap={2}>
+				<Text fontSize="sm" fontWeight="bold">
+					{emoji} {title}
+				</Text>
+				{count > 0 && (
+					<Badge colorPalette="gray" borderRadius="full" size="sm">
+						{count}
+					</Badge>
+				)}
+			</HStack>
+			{description && (
+				<Text fontSize="xs" color="fg.muted">{description}</Text>
 			)}
-		</HStack>
+		</VStack>
 	)
 }
 
 function Section({
 	emoji,
 	title,
+	description,
 	items,
 	onComplete,
 	feedbackId,
 }: {
 	emoji: string
 	title: string
+	description?: string
 	items: ScoredTodo[]
 	onComplete: (id: string, isDoNow: boolean) => void
 	feedbackId: string | null
@@ -43,7 +56,7 @@ function Section({
 	if (items.length === 0) return null
 	return (
 		<VStack gap={2} align="stretch">
-			<SectionHeader emoji={emoji} title={title} count={items.length} />
+			<SectionHeader emoji={emoji} title={title} count={items.length} description={description} />
 			{items.map(item => (
 				<TaskCard
 					key={item.todo.id}
@@ -85,18 +98,6 @@ export function TodayView({
 
 	return (
 		<VStack gap={5} align="stretch">
-			{/* 상태 요약 */}
-			<Box bg="bg.subtle" borderRadius="xl" p={4}>
-				<HStack justify="space-between" mb={1}>
-					<Text fontSize="sm" fontWeight="bold" color="fg">
-						{cfg.emoji} {cfg.label} 상태예요
-					</Text>
-				</HStack>
-				<Text fontSize="xs" color="fg.muted">
-					{cfg.description}
-				</Text>
-			</Box>
-
 			{/* 과부하 경고 */}
 			{recs.isOverloaded && (
 				<Box bg="bg.error" borderRadius="xl" px={4} py={3}>
@@ -127,6 +128,7 @@ export function TodayView({
 					<Section
 						emoji="⚡"
 						title="지금 하면 좋은 것"
+						description={DO_NOW_DESC[energy]}
 						items={recs.doNow}
 						onComplete={handleComplete}
 						feedbackId={feedbackId}
@@ -137,6 +139,7 @@ export function TodayView({
 					<Section
 						emoji="😌"
 						title="부담 없는 것"
+						description="부담 없이 바로 시작할 수 있어요"
 						items={recs.easyPicks}
 						onComplete={handleComplete}
 						feedbackId={null}
