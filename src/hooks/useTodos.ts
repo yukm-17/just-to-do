@@ -20,6 +20,26 @@ function mapNode(todos: Todo[], id: string, fn: (t: Todo) => Todo): Todo[] {
   return todos.map(t => t.id === id ? fn(t) : { ...t, children: mapNode(t.children, id, fn) });
 }
 
+// 직접 부모(한 단계)만 자동 완료 — 재귀 연쇄 없음
+function autoCompleteParent(todos: Todo[], childId: string): Todo[] {
+  return todos.map(t => {
+    if (t.children.some(c => c.id === childId)) {
+      return t.children.every(c => c.completed) ? { ...t, completed: true } : t;
+    }
+    return { ...t, children: autoCompleteParent(t.children, childId) };
+  });
+}
+
+// completed 필터: 완료된 항목 + 완료된 하위를 가진 미완료 부모를 포함
+function filterForCompleted(todos: Todo[]): Todo[] {
+  return todos.flatMap(t => {
+    const filteredChildren = filterForCompleted(t.children);
+    if (t.completed) return [{ ...t, children: filteredChildren }];
+    if (filteredChildren.length > 0) return [{ ...t, children: filteredChildren }];
+    return [];
+  });
+}
+
 function filterNode(todos: Todo[], id: string): Todo[] {
   return todos.filter(t => t.id !== id).map(t => ({ ...t, children: filterNode(t.children, id) }));
 }
@@ -108,7 +128,15 @@ export function useTodos() {
   };
 
   const toggleTodo = (id: string) => {
-    setTodos(prev => mapNode(prev, id, t => ({ ...t, completed: !t.completed })));
+    setTodos(prev => {
+      const updated = mapNode(prev, id, t => ({ ...t, completed: !t.completed }));
+      // 완료로 바꿨을 때만 부모 자동 완료 체크
+      let wasCompleted = false;
+      const find = (items: Todo[]): boolean =>
+        items.some(t => t.id === id ? (wasCompleted = t.completed, true) : find(t.children));
+      find(prev);
+      return wasCompleted ? updated : autoCompleteParent(updated, id);
+    });
   };
 
   const deleteTodo = (id: string) => {
@@ -139,11 +167,11 @@ export function useTodos() {
     setTodos(prev => removeCompleted(prev));
   };
 
-  const filteredTodos = todos.filter(t => {
-    if (filter === 'active') return !t.completed;
-    if (filter === 'completed') return t.completed;
-    return true;
-  });
+  const filteredTodos = filter === 'completed'
+    ? filterForCompleted(todos)
+    : filter === 'active'
+      ? todos.filter(t => !t.completed)
+      : todos;
 
   const { active: activeCount, completed: completedCount } = countAll(todos);
 
