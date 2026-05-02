@@ -15,7 +15,6 @@ import {
 	Heading,
 	HStack,
 	IconButton,
-	Separator,
 	Text,
 	VStack,
 } from '@chakra-ui/react'
@@ -82,6 +81,7 @@ export default function App() {
 		toggleTodo,
 		deleteTodo,
 		editTodo,
+		updateMeta,
 		toggleCollapse,
 		reparentItem,
 	} = useTodos()
@@ -142,7 +142,7 @@ export default function App() {
 							</HStack>
 
 							{/* 기분 질문 */}
-							<Text fontSize="sm" color="fg.muted" mb={3}>
+							<Text fontSize="md" fontWeight="bold" textAlign="center" letterSpacing="tight" mb={3}>
 								지금 기분이 어때요?
 							</Text>
 
@@ -176,39 +176,38 @@ export default function App() {
 
 						{/* 오늘 모드 */}
 						{view === 'today' && (
-							<Box bg="bg.panel" borderRadius="2xl" p={{ base: '4', md: '5' }} shadow="md">
-								{todos.length === 0 ? (
-									<Center py={10}>
-										<VStack gap={2}>
-											<Text fontSize="sm" color="fg.muted">
-												할 일이 없어요
-											</Text>
-											<Button
-												size="sm"
-												colorPalette="purple"
-												variant="ghost"
-												onClick={() => setView('all')}
-											>
-												전체 할 일에서 추가하기 →
-											</Button>
-										</VStack>
-									</Center>
-								) : (
-									<TodayView
-										todos={todos}
-										energy={energy}
-										onToggle={toggleTodo}
-										onRecordCompletion={recordCompletion}
-									/>
-								)}
-							</Box>
+							todos.length === 0 ? (
+								<Center py={10}>
+									<VStack gap={2}>
+										<Text fontSize="sm" color="fg.muted">
+											할 일이 없어요
+										</Text>
+										<Button
+											size="sm"
+											colorPalette="purple"
+											variant="ghost"
+											onClick={() => setView('all')}
+										>
+											전체 할 일에서 추가하기 →
+										</Button>
+									</VStack>
+								</Center>
+							) : (
+								<TodayView
+									todos={todos}
+									energy={energy}
+									onToggle={toggleTodo}
+									onRecordCompletion={recordCompletion}
+								/>
+							)
 						)}
 
 						{/* 전체 할 일 (트리 뷰) */}
 						{view === 'all' && (
-							<Box bg="bg.panel" borderRadius="2xl" p={{ base: '4', md: '5' }} shadow="md">
-								<TodoInput onAdd={addTodo} />
-								<Separator my={4} />
+							<>
+								<Box bg="bg.panel" borderRadius="xl" shadow="sm" p={{ base: '3', md: '4' }}>
+									<TodoInput onAdd={addTodo} />
+								</Box>
 
 								{todos.length === 0 ? (
 									<Center py={10}>
@@ -223,9 +222,10 @@ export default function App() {
 										onEdit={editTodo}
 										onAddChild={addChild}
 										onToggleCollapse={toggleCollapse}
+										onUpdateMeta={updateMeta}
 									/>
 								)}
-							</Box>
+							</>
 						)}
 					</VStack>
 				</Container>

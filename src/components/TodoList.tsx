@@ -22,7 +22,6 @@ interface FlatItem {
 function flatten(todos: Todo[], parentId: string | null = null, depth = 0): FlatItem[] {
   return todos.flatMap(todo => {
     const item: FlatItem = { id: todo.id, parentId, depth, todo };
-    if (todo.collapsed) return [item];
     return [item, ...flatten(todo.children, todo.id, depth + 1)];
   });
 }
@@ -122,6 +121,22 @@ export function TodoList({ todos, onReparent, ...handlers }: Props) {
     [allFlat, activeId]
   );
 
+  // 루트 아이템(depth=0) 기준으로 그룹핑
+  const groups = useMemo(() => {
+    const result: FlatItem[][] = [];
+    let current: FlatItem[] = [];
+    for (const item of flatItems) {
+      if (item.depth === 0) {
+        if (current.length > 0) result.push(current);
+        current = [item];
+      } else {
+        current.push(item);
+      }
+    }
+    if (current.length > 0) result.push(current);
+    return result;
+  }, [flatItems]);
+
   // DragOverlay에 표시할 projected depth (가로 이동에 따라 실시간 업데이트)
   const projectedDepth = useMemo(() => {
     if (!activeFlat || !overId) return activeFlat?.depth ?? 0;
@@ -168,15 +183,28 @@ export function TodoList({ todos, onReparent, ...handlers }: Props) {
       onDragCancel={handleDragCancel}
     >
       <SortableContext items={flatItems.map(i => i.id)} strategy={verticalListSortingStrategy}>
-        <VStack gap={1} align="stretch" style={{ userSelect: 'none', WebkitUserSelect: 'none' } as React.CSSProperties}>
-          {flatItems.map(item => (
-            <TodoItem
-              key={item.id}
-              todo={item.todo}
-              depth={item.depth}
-              onReparent={onReparent}
-              {...handlers}
-            />
+        <VStack gap={2} align="stretch" style={{ userSelect: 'none', WebkitUserSelect: 'none' } as React.CSSProperties}>
+          {groups.map(group => (
+            <Box
+              key={group[0].id}
+              bg="bg.panel"
+              borderRadius="xl"
+              shadow="sm"
+              overflow="hidden"
+              p={1}
+            >
+              <VStack gap={1} align="stretch">
+                {group.map(item => (
+                  <TodoItem
+                    key={item.id}
+                    todo={item.todo}
+                    depth={item.depth}
+                    onReparent={onReparent}
+                    {...handlers}
+                  />
+                ))}
+              </VStack>
+            </Box>
           ))}
         </VStack>
       </SortableContext>

@@ -20,8 +20,9 @@ export function TaskCard({ item, onComplete, feedback }: Props) {
 
   return (
     <Box
-      bg={done ? 'bg.muted' : 'bg.subtle'}
+      bg="bg.panel"
       borderRadius="xl"
+      shadow="sm"
       px={4}
       py={3}
       opacity={done ? 0.6 : 1}

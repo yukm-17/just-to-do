@@ -1,4 +1,5 @@
-import { HStack, VStack, Text, Button } from '@chakra-ui/react';
+import { useState } from 'react';
+import { HStack, VStack, Text, Button, Input } from '@chakra-ui/react';
 import type { TaskMeta, Difficulty, FocusLevel } from '@/types/todo';
 
 interface Props {
@@ -18,7 +19,44 @@ const FOCUS_LEVELS: { value: FocusLevel; label: string }[] = [
   { value: 'high', label: '높음' },
 ];
 
+const PRESETS = [5, 10, 15, 20, 25, 30];
+
+const selectStyle: React.CSSProperties = {
+  fontSize: '14px',
+  padding: '6px 10px',
+  borderRadius: '8px',
+  border: '1px solid var(--chakra-colors-border)',
+  background: 'var(--chakra-colors-bg-subtle)',
+  color: 'inherit',
+  outline: 'none',
+  cursor: 'pointer',
+};
+
 export function MetaInput({ meta, onChange }: Props) {
+  const isCustom = !PRESETS.includes(meta.estimatedMinutes);
+  const [showCustomInput, setShowCustomInput] = useState(isCustom);
+  const [customValue, setCustomValue] = useState(
+    isCustom ? String(meta.estimatedMinutes) : ''
+  );
+
+  const handleTimeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === 'custom') {
+      setShowCustomInput(true);
+      setCustomValue('');
+    } else {
+      setShowCustomInput(false);
+      onChange({ ...meta, estimatedMinutes: Number(val) });
+    }
+  };
+
+  const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    setCustomValue(raw);
+    const n = Number(raw);
+    if (n > 0) onChange({ ...meta, estimatedMinutes: n });
+  };
+
   return (
     <VStack gap={2} align="stretch" px={1}>
       <HStack gap={2} flexWrap="wrap">
@@ -39,25 +77,32 @@ export function MetaInput({ meta, onChange }: Props) {
         </HStack>
       </HStack>
 
-      <HStack gap={2}>
+      <HStack gap={2} flexWrap="wrap">
         <Text fontSize="xs" color="fg.muted" minW="max-content">예상 시간</Text>
+        {showCustomInput && (
+          <HStack gap={1}>
+            <Input
+              type="text"
+              inputMode="numeric"
+              size="xs"
+              w="60px"
+              borderRadius="lg"
+              value={customValue}
+              onChange={handleCustomChange}
+              placeholder="분"
+            />
+            <Text fontSize="xs" color="fg.muted">분</Text>
+          </HStack>
+        )}
         <select
-          value={meta.estimatedMinutes}
-          onChange={e => onChange({ ...meta, estimatedMinutes: Number(e.target.value) })}
-          style={{
-            fontSize: '12px',
-            padding: '2px 6px',
-            borderRadius: '8px',
-            border: '1px solid var(--chakra-colors-border)',
-            background: 'var(--chakra-colors-bg-subtle)',
-            color: 'inherit',
-            outline: 'none',
-            cursor: 'pointer',
-          }}
+          value={showCustomInput ? 'custom' : meta.estimatedMinutes}
+          onChange={handleTimeSelect}
+          style={selectStyle}
         >
-          {[5, 10, 15, 20, 30, 45, 60, 90, 120].map(m => (
+          {PRESETS.map(m => (
             <option key={m} value={m}>{m}분</option>
           ))}
+          <option value="custom">직접입력</option>
         </select>
       </HStack>
 
