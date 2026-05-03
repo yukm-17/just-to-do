@@ -7,7 +7,7 @@ import { getRecommendations } from '@/lib/recommendation'
 import { ENERGY_CONFIG, type EnergyLevel, type ScoredTodo } from '@/types/energy'
 import type { TaskMeta, Todo } from '@/types/todo'
 
-const TOTAL_STEPS = 6
+const TOTAL_STEPS = 7
 
 interface Props {
   energy: EnergyLevel
@@ -85,7 +85,7 @@ export function Onboarding({
 
   const createdTodo = todos.find(t => t.id === createdId) ?? null
   const cfg = ENERGY_CONFIG[energy]
-  const liveRecs = step === 4 ? getRecommendations(todos, energy) : null
+  const liveRecs = step === 5 ? getRecommendations(todos, energy) : null
   const previewRec = liveRecs ? (liveRecs.doNow[0] ?? liveRecs.easyPicks[0] ?? null) : null
 
   return (
@@ -235,8 +235,37 @@ export function Onboarding({
           )
         )}
 
-        {/* Step 4: Todo 추천 미리보기 */}
+        {/* Step 4: DnD 순서 변경 안내 */}
         {step === 4 && (
+          <VStack gap={5} align="stretch">
+            <VStack gap={1.5} align="start">
+              <Text fontSize="lg" fontWeight="bold">↕️ 순서를 자유롭게 바꿔요</Text>
+              <Text fontSize="sm" color="fg.muted" lineHeight="1.6">
+                할 일을 길게 누른 채 끌면 순서를 바꾸거나,<br />
+                다른 항목의 하위로 이동할 수 있어요
+              </Text>
+            </VStack>
+            <Box bg="bg.subtle" borderRadius="xl" p={3}>
+              <VStack gap={1.5} align="stretch">
+                <Box bg="bg.panel" borderRadius="xl" px={3} py={2.5} shadow="sm">
+                  <Text fontSize="sm">📌 중요한 일</Text>
+                </Box>
+                <Box bg="bg.panel" borderRadius="xl" px={3} py={2.5} shadow="sm" borderLeft="2px solid" borderColor="purple.400">
+                  <Text fontSize="sm" color="purple.500" fontWeight="medium">↕ 길게 눌러서 위아래로 드래그</Text>
+                </Box>
+                <Box bg="bg.panel" borderRadius="xl" px={3} py={2.5} shadow="sm">
+                  <Text fontSize="sm">📋 다른 일</Text>
+                </Box>
+              </VStack>
+            </Box>
+            <Button colorPalette="purple" borderRadius="xl" onClick={next}>
+              이해했어요 →
+            </Button>
+          </VStack>
+        )}
+
+        {/* Step 5: Todo 추천 미리보기 */}
+        {step === 5 && (
           <VStack gap={5} align="stretch">
             <VStack gap={1.5} align="start">
               <Text fontSize="lg" fontWeight="bold">
@@ -265,8 +294,8 @@ export function Onboarding({
           </VStack>
         )}
 
-        {/* Step 5: 완료 + 칭찬 */}
-        {step === 5 && (
+        {/* Step 6: 완료 + 칭찬 */}
+        {step === 6 && (
           praised ? (
             <VStack gap={5} align="stretch">
               <Center py={6}>
