@@ -1,4 +1,5 @@
 import { EnergySelector } from '@/components/EnergySelector'
+import { LandingPage } from '@/components/LandingPage'
 import { Onboarding } from '@/components/Onboarding'
 import { TodayView } from '@/components/TodayView'
 import { TodoInput } from '@/components/TodoInput'
@@ -19,9 +20,21 @@ import {
 	VStack,
 } from '@chakra-ui/react'
 import { Analytics } from '@vercel/analytics/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type View = 'today' | 'all'
+type Screen = 'landing' | 'app'
+
+const LANDING_QUERY_KEYS = ['landing', 'landing-check']
+
+function hasLandingQuery() {
+	const params = new URLSearchParams(window.location.search)
+	return LANDING_QUERY_KEYS.some(key => params.has(key))
+}
+
+function shouldShowLanding() {
+	return hasLandingQuery() || localStorage.getItem('just-to-do-started') !== 'true'
+}
 
 function MoonIcon() {
 	return (
@@ -68,6 +81,7 @@ function SunIcon() {
 
 export default function App() {
 	const [view, setView] = useState<View>('today')
+	const [showLanding, setShowLanding] = useState(shouldShowLanding)
 	const [showOnboarding, setShowOnboarding] = useState(
 		() => localStorage.getItem('just-to-do-onboarded') !== 'true',
 	)
@@ -85,6 +99,51 @@ export default function App() {
 		toggleCollapse,
 		reparentItem,
 	} = useTodos()
+
+	useEffect(() => {
+		const currentScreen: Screen = showLanding ? 'landing' : 'app'
+		if (history.state?.justToDoScreen !== currentScreen) {
+			history.replaceState(
+				{ ...history.state, justToDoScreen: currentScreen },
+				'',
+				window.location.href,
+			)
+		}
+
+		const handlePopState = (event: PopStateEvent) => {
+			const screen = event.state?.justToDoScreen as Screen | undefined
+
+			if (screen === 'landing') {
+				setShowLanding(true)
+				return
+			}
+
+			if (screen === 'app') {
+				setShowLanding(false)
+				return
+			}
+
+			setShowLanding(hasLandingQuery())
+		}
+
+		window.addEventListener('popstate', handlePopState)
+		return () => window.removeEventListener('popstate', handlePopState)
+	}, [showLanding])
+
+	const handleStart = () => {
+		localStorage.setItem('just-to-do-started', 'true')
+		history.pushState({ justToDoScreen: 'app' }, '', window.location.href)
+		setShowLanding(false)
+	}
+
+	if (showLanding) {
+		return (
+			<>
+				<Analytics />
+				<LandingPage onStart={handleStart} />
+			</>
+		)
+	}
 
 	return (
 		<>
