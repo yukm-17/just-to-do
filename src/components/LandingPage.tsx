@@ -27,8 +27,8 @@ function ArrowRightIcon() {
 
 const features = [
 	{
-		title: '오늘 컨디션 기준 추천',
-		description: '에너지가 낮은 날에는 쉬운 일을, 집중이 좋은 날에는 중요한 일을 먼저 보여줍니다.',
+		title: '오늘 감정 기준 추천',
+		description: '기분이 가라앉은 날에는 가벼운 일부터, 의욕이 넘치는 날에는 핵심 일부터 보여줍니다.',
 	},
 	{
 		title: '큰 일을 작게 나누기',
@@ -36,7 +36,7 @@ const features = [
 	},
 	{
 		title: '난이도와 시간 기록',
-		description: '난이도, 예상 시간, 집중도를 저장해 지금 시작하기 좋은 일을 고르는 데 씁니다.',
+		description: '난이도, 예상 시간, 집중도를 저장해 지금 감정에 맞는 일을 고르는 데 씁니다.',
 	},
 ]
 
@@ -70,13 +70,13 @@ export function LandingPage({ onStart }: LandingPageProps) {
 										textTransform="uppercase"
 										letterSpacing="0"
 										>
-											에너지 기반 할 일 관리 앱
+											감정 기반 할 일 관리 앱
 										</Text>
 										<Heading as="h1" size={{ base: '4xl', md: '5xl' }} lineHeight="1.05" letterSpacing="0">
 											Just To Do
 										</Heading>
 										<Text as="p" fontSize={{ base: 'lg', md: 'xl' }} color="fg.muted" lineHeight="1.7" maxW="560px">
-											오늘의 컨디션에 맞춰 할 일을 추천하고, 큰 작업은 작은 단계로 나눠 바로 시작하게 돕습니다.
+											오늘 기분에 맞는 할 일을 골라주고, 큰 작업은 작은 단계로 나눠 부담 없이 시작할 수 있게 돕습니다.
 										</Text>
 								</VStack>
 
@@ -122,7 +122,7 @@ export function LandingPage({ onStart }: LandingPageProps) {
 										</Text>
 										<Text fontWeight="bold">25분 안에 끝나는 쉬운 작업부터</Text>
 										<Text fontSize="sm" color="fg.muted" mt="1">
-											컨디션, 난이도, 시간을 함께 보고 우선순위를 정합니다.
+											오늘 감정, 난이도, 시간을 함께 보고 우선순위를 정합니다.
 										</Text>
 								</Box>
 							</Box>
