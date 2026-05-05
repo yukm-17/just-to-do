@@ -24,6 +24,16 @@ function MoreIcon() {
   );
 }
 
+function DragHandleIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/>
+      <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+      <circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
+    </svg>
+  );
+}
+
 export function TodoItem({
   todo, depth,
   onReparent: _onReparent,
@@ -37,7 +47,7 @@ export function TodoItem({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const editRef = useRef<HTMLInputElement>(null);
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
     useSortable({ id: todo.id });
 
   useEffect(() => { if (editing) editRef.current?.focus(); }, [editing]);
@@ -65,15 +75,11 @@ export function TodoItem({
     <Box
       ref={setNodeRef}
       {...attributes}
-      {...listeners}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
         paddingLeft: `${depth * INDENT}px`,
-        touchAction: 'none',
       }}
-      cursor="grab"
-      _active={{ cursor: 'grabbing' }}
       opacity={isDragging ? 0.3 : 1}
     >
       <Box
@@ -83,7 +89,21 @@ export function TodoItem({
         _hover={{ bg: 'bg.subtle' }}
         transition="background 0.15s"
       >
-        <HStack gap={1.5} align="center">
+        <HStack gap={1.5} align="start">
+          {/* 드래그 핸들 */}
+          <Box
+            ref={setActivatorNodeRef}
+            {...listeners}
+            cursor="grab"
+            _active={{ cursor: 'grabbing' }}
+            color="fg.muted"
+            flexShrink={0}
+            style={{ touchAction: 'none' }}
+            p={0.5}
+          >
+            <DragHandleIcon />
+          </Box>
+
           {/* 체크박스 + 내용 그룹 */}
           <HStack gap={2} flex={1} minW={0} align="start">
             <CheckboxRoot
